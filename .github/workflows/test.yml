@@ -26,10 +26,11 @@ jobs:
         run: |
           go mod tidy
           go mod download
-          go install github.com/onsi/ginkgo/ginkgo
+      #          go install github.com/onsi/ginkgo/ginkgo
 
       - name: Test
-        run: go test -v ./... -args -ginkgo.randomizeAllSpecs -ginkgo.trace
+        run: go test -v ./...
+      #        run: go test -v ./... -args -ginkgo.randomizeAllSpecs -ginkgo.trace
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
