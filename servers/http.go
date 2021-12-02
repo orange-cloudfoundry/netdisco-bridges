@@ -31,7 +31,11 @@ func NewHTTPServer(resolver *services.Resolver, config *models.HTTPServerConfig)
 }
 
 func (s *HTTPServer) listRoutes(w http.ResponseWriter, req *http.Request) {
-	format := req.URL.Query().Get("format")
+
+	format := mux.Vars(req)["format"]
+	if format == "" {
+		format = req.URL.Query().Get("format")
+	}
 	domain := mux.Vars(req)["domain"]
 	w.Header().Set("Content-Type", "application/json")
 	result, err := s.resolver.GetEntryRoutes(format, domain)
@@ -56,6 +60,7 @@ func (s *HTTPServer) listDevices(w http.ResponseWriter, req *http.Request) {
 func (s *HTTPServer) Run(ctx context.Context) {
 	subRouter := s.mux.PathPrefix("/api/v1").Subrouter()
 	subRouter.HandleFunc("/entries/*/routes", s.listRoutes)
+	subRouter.HandleFunc("/entries/*/routes/{format}", s.listRoutes)
 	subRouter.HandleFunc("/entries/{domain}/routes", s.listRoutes)
 	subRouter.HandleFunc("/entries", s.listEntries)
 	subRouter.HandleFunc("/entries/{domain}/devices", s.listDevices)

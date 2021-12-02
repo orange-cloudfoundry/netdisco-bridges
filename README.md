@@ -47,8 +47,8 @@ entries:
 
 ### With API
 
-- `http://127.0.0.1:8080/api/v1/entries/*/routes?format=default` - Gave all http routes formatted for all entries, setting format to `traefik`
-  will let use this api as an http provider
+- `http://127.0.0.1:8080/api/v1/entries/*/routes` - Gave all http routes formatted for all entries
+- `http://127.0.0.1:8080/api/v1/entries/*/routes/traefik` - Gave all http routes formatted for all entries in traefik format for using as provider
 - `http://127.0.0.1:8080/api/v1/entries/{domain entry}/routes?format=default` - Gave http routes formatted for specified entry
 - `http://127.0.0.1:8080/api/v1/entries` - List all entries set
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/devices` - Gave all devices formatted for specified entry
