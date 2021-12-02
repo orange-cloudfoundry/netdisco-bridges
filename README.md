@@ -178,7 +178,7 @@ Device information become accessible for each value, device has those informatio
 - `LastMacsuckStamp`
 - `LastDiscoverStamp`
 
-```
+```yaml
 # Scheme to use to create route
 [ scheme: <string|template> | default = "https" ]
 # Port for accessing to route
