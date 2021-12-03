@@ -69,7 +69,7 @@ func (t *Traefik) convertRoute(route models.Routing) (*traefikRouter, *traefikSe
 	if route.Port > 0 {
 		port = fmt.Sprintf(":%d", route.Port)
 	}
-	url := fmt.Sprintf("%s://%s%s", route.Scheme, route.Host, port)
+	url := fmt.Sprintf("%s://%s%s", route.Scheme, route.IP, port)
 
 	entrypoints := []string{"http"}
 	if intEntryPts, ok := route.Metadata["entryPoints"]; ok {
@@ -80,12 +80,12 @@ func (t *Traefik) convertRoute(route models.Routing) (*traefikRouter, *traefikSe
 	return &traefikRouter{
 			EntryPoints: entrypoints,
 			Service:     t.serviceName(route),
-			Rule:        fmt.Sprintf("Host(`%s`)", url),
+			Rule:        fmt.Sprintf("Host(`%s`)", route.Host),
 		},
 		&traefikService{
 			LoadBalancer: &traefikServersLoadBalancer{Servers: []traefikServer{
 				{
-					URL: fmt.Sprintf("%s://%s", route.Scheme, route.IP),
+					URL: url,
 				},
 			}},
 		}
