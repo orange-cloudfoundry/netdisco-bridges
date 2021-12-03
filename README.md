@@ -187,7 +187,7 @@ Device information become accessible for each value, device has those informatio
 [ host: <string|template> | default = not set ]
 # metadata for let formatter do its magic
 # for now, only traefik use it
-# you can set `entryPoints` for traefik
+# you can set `entryPoints` for traefik and `enableTls` to true to enable resolve on traefik on tls also.
 metadata:
   <string|template>: <map|template>
 ```

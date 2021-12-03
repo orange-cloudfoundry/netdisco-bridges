@@ -20,9 +20,17 @@ type traefikService struct {
 
 // traefikRouter holds the router configuration.
 type traefikRouter struct {
-	EntryPoints []string `json:"entryPoints,omitempty" toml:"entryPoints,omitempty" yaml:"entryPoints,omitempty" export:"true"`
-	Service     string   `json:"service,omitempty" toml:"service,omitempty" yaml:"service,omitempty" export:"true"`
-	Rule        string   `json:"rule,omitempty" toml:"rule,omitempty" yaml:"rule,omitempty"`
+	EntryPoints []string                `json:"entryPoints,omitempty" toml:"entryPoints,omitempty" yaml:"entryPoints,omitempty" export:"true"`
+	Service     string                  `json:"service,omitempty" toml:"service,omitempty" yaml:"service,omitempty" export:"true"`
+	Rule        string                  `json:"rule,omitempty" toml:"rule,omitempty" yaml:"rule,omitempty"`
+	TLS         *traefikRouterTLSConfig `json:"tls,omitempty" toml:"tls,omitempty" yaml:"tls,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
+}
+
+// traefikRouterTLSConfig holds the TLS configuration for a router.
+type traefikRouterTLSConfig struct {
+	Options      string   `json:"options,omitempty" toml:"options,omitempty" yaml:"options,omitempty" export:"true"`
+	CertResolver string   `json:"certResolver,omitempty" toml:"certResolver,omitempty" yaml:"certResolver,omitempty" export:"true"`
+	Domains      []string `json:"domains,omitempty" toml:"domains,omitempty" yaml:"domains,omitempty" export:"true"`
 }
 
 // traefikServer holds the server configuration.
@@ -48,8 +56,10 @@ func (t *Traefik) Convert(routes []models.Routing) (interface{}, error) {
 
 	for _, r := range routes {
 		serviceName := t.serviceName(r)
-		router, service := t.convertRoute(r)
-		routers[serviceName] = router
+		routersRoute, service := t.convertRoute(r)
+		for k, v := range routersRoute {
+			routers[k] = v
+		}
 		services[serviceName] = service
 	}
 
@@ -63,7 +73,7 @@ func (t *Traefik) Convert(routes []models.Routing) (interface{}, error) {
 	}, nil
 }
 
-func (t *Traefik) convertRoute(route models.Routing) (*traefikRouter, *traefikService) {
+func (t *Traefik) convertRoute(route models.Routing) (map[string]*traefikRouter, *traefikService) {
 
 	port := ""
 	if route.Port > 0 {
@@ -77,11 +87,23 @@ func (t *Traefik) convertRoute(route models.Routing) (*traefikRouter, *traefikSe
 			entrypoints = newEntryPoints
 		}
 	}
-	return &traefikRouter{
+	serviceName := t.serviceName(route)
+	routers := make(map[string]*traefikRouter)
+	routers[serviceName] = &traefikRouter{
+		EntryPoints: entrypoints,
+		Service:     t.serviceName(route),
+		Rule:        fmt.Sprintf("Host(`%s`)", route.Host),
+	}
+	if _, ok := route.Metadata["enableTls"]; ok {
+		routers[serviceName+"-tls"] = &traefikRouter{
 			EntryPoints: entrypoints,
 			Service:     t.serviceName(route),
 			Rule:        fmt.Sprintf("Host(`%s`)", route.Host),
-		},
+			TLS:         &traefikRouterTLSConfig{},
+		}
+	}
+
+	return routers,
 		&traefikService{
 			LoadBalancer: &traefikServersLoadBalancer{Servers: []traefikServer{
 				{
