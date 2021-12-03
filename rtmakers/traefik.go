@@ -83,8 +83,12 @@ func (t *Traefik) convertRoute(route models.Routing) (map[string]*traefikRouter,
 
 	entrypoints := []string{"http"}
 	if intEntryPts, ok := route.Metadata["entryPoints"]; ok {
-		if newEntryPoints, ok := intEntryPts.([]string); ok {
-			entrypoints = newEntryPoints
+		if newEntryPoints, ok := intEntryPts.([]interface{}); ok {
+			entrypoints = make([]string, 0)
+			for _, e := range newEntryPoints {
+				entrypoints = append(entrypoints, e.(string))
+			}
+
 		}
 	}
 	serviceName := t.serviceName(route)

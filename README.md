@@ -30,7 +30,8 @@ entries:
     routing:
       scheme: https
       host: '{{ .IP }}'
-      entryPoints: [ https ]
+      metadata:
+        entryPoints: [ https ]
     targets:
       - q: '%'
 ```
