@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/orange-cloudfoundry/netdisco-bridges/models"
@@ -58,6 +59,7 @@ func (s *HTTPServer) listDevices(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *HTTPServer) Run(ctx context.Context) {
+	s.mux.Path("/metrics").Handler(promhttp.Handler())
 	subRouter := s.mux.PathPrefix("/api/v1").Subrouter()
 	subRouter.HandleFunc("/entries/*/routes", s.listRoutes)
 	subRouter.HandleFunc("/entries/*/routes/{format}", s.listRoutes)

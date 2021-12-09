@@ -9,9 +9,10 @@ import (
 type Entries []*Entry
 
 type Entry struct {
-	Domain  string                        `yaml:"domain" json:"domain"`
-	Routing *Routing                      `yaml:"routing" json:"-"`
-	Targets []*netdisco.SearchDeviceQuery `yaml:"targets" json:"targets"`
+	Domain        string                        `yaml:"domain" json:"domain"`
+	Routing       *Routing                      `yaml:"routing" json:"-"`
+	EnableMetrics bool                          `yaml:"enable_metrics" json:"-"`
+	Targets       []*netdisco.SearchDeviceQuery `yaml:"targets" json:"targets"`
 }
 
 func (e *Entry) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -25,6 +26,9 @@ func (e *Entry) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	if len(e.Targets) == 0 {
 		return fmt.Errorf("at least one target must be set")
+	}
+	for _, t := range e.Targets {
+		t.SeeAllColumns = true
 	}
 	return nil
 }

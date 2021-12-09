@@ -121,6 +121,7 @@ type NetdiscoConfig struct {
 	Endpoint           string `yaml:"endpoint"`
 	Username           string `yaml:"username"`
 	Password           string `yaml:"password"`
+	ApiKey             string `yaml:"api_key"`
 	InsecureSkipVerify bool   `yaml:"insecure_skip_verify"`
 }
 

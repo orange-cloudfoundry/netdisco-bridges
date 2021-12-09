@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -21,8 +22,15 @@ var (
 	configFile = kingpin.Flag("config", "Configuration File").Default("config.yml").Short('c').String()
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
+
 func main() {
-	kingpin.Version("bgp-blacklister")
+	kingpin.Version(fmt.Sprintf("netdisco-bridges %s, commit %s, built at %s by %s", version, commit, date, builtBy))
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
@@ -31,13 +39,21 @@ func main() {
 		logrus.Fatal(err.Error())
 		return
 	}
-
-	nClient := netdisco.NewClient(
-		cnf.Netdisco.Endpoint,
-		cnf.Netdisco.Username,
-		cnf.Netdisco.Password,
-		cnf.Netdisco.InsecureSkipVerify,
-	)
+	var nClient *netdisco.Client
+	if cnf.Netdisco.ApiKey != "" {
+		nClient = netdisco.NewClientWithApiKey(
+			cnf.Netdisco.Endpoint,
+			cnf.Netdisco.ApiKey,
+			cnf.Netdisco.InsecureSkipVerify,
+		)
+	} else {
+		nClient = netdisco.NewClient(
+			cnf.Netdisco.Endpoint,
+			cnf.Netdisco.Username,
+			cnf.Netdisco.Password,
+			cnf.Netdisco.InsecureSkipVerify,
+		)
+	}
 
 	resolver := services.NewResolver(
 		cnf.Entries,
