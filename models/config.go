@@ -32,12 +32,13 @@ func (c *DNSServerConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 }
 
 type Config struct {
-	DNSServer  *DNSServerConfig  `yaml:"dns_server"`
-	HTTPServer *HTTPServerConfig `yaml:"http_server"`
-	Entries    Entries           `yaml:"entries"`
-	Netdisco   *NetdiscoConfig   `yaml:"netdisco"`
-	Workers    *WorkersConfig    `yaml:"workers"`
-	Log        *Log              `yaml:"log"`
+	DNSServer             *DNSServerConfig  `yaml:"dns_server"`
+	HTTPServer            *HTTPServerConfig `yaml:"http_server"`
+	Entries               Entries           `yaml:"entries"`
+	Netdisco              *NetdiscoConfig   `yaml:"netdisco"`
+	Workers               *WorkersConfig    `yaml:"workers"`
+	Log                   *Log              `yaml:"log"`
+	DisableReportsMetrics bool              `yaml:"disable_reports_metrics"`
 }
 
 func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {

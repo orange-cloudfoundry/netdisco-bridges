@@ -54,6 +54,10 @@ entries:
 - `http://127.0.0.1:8080/api/v1/entries` - List all entries set
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/devices` - Gave all devices formatted for specified entry
 
+### Prometheus metrics
+
+Simply hit `http://127.0.0.1:8080/metrics`
+
 ## Configuration
 
 For understanding config definition format:
@@ -111,6 +115,9 @@ workers:
   # Interval for data to be refreshed from netdisco
   [ refresh_interval: <duration> | default = "25m" ]
 
+# Set to true to disable metrics from netdisco reports
+[ disable_reports_metrics: <bool> ]
+
 # list of entry (defined below)
 entries:
 - <entry>
@@ -121,6 +128,9 @@ entries:
 ```yaml
 # Domain will be used for dns/http api for getting list of devices associated
 domain: <string>
+# set to true if you want to get netdisco_device_info metrics for getting information about devices in this domain
+# in openmetrics format for prometheus usage
+[ enable_metrics: <bool> ]
 # Netdisco search criteria, at least one is required
 targets:
   # Partial match of Device contact, serial, chassis ID, module serials, location, name, description, dns, or any IP alias

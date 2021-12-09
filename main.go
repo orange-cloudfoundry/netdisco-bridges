@@ -10,9 +10,11 @@ import (
 	"time"
 
 	"github.com/orange-cloudfoundry/go-netdisco"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/orange-cloudfoundry/netdisco-bridges/metrics"
 	"github.com/orange-cloudfoundry/netdisco-bridges/models"
 	"github.com/orange-cloudfoundry/netdisco-bridges/servers"
 	"github.com/orange-cloudfoundry/netdisco-bridges/services"
@@ -39,6 +41,7 @@ func main() {
 		logrus.Fatal(err.Error())
 		return
 	}
+
 	var nClient *netdisco.Client
 	if cnf.Netdisco.ApiKey != "" {
 		nClient = netdisco.NewClientWithApiKey(
@@ -63,6 +66,19 @@ func main() {
 	)
 
 	ctx, cancelResolver := context.WithCancel(context.Background())
+
+	domainsMetrics := make([]string, 0)
+	for _, e := range cnf.Entries {
+		if !e.EnableMetrics {
+			continue
+		}
+		domainsMetrics = append(domainsMetrics, e.Domain)
+	}
+	prometheus.MustRegister(metrics.NewDeviceCollectors(resolver, domainsMetrics))
+
+	if !cnf.DisableReportsMetrics {
+		prometheus.MustRegister(metrics.NewReportsCollectors(nClient))
+	}
 
 	go func(ctx context.Context) {
 		logrus.Info("resolver service started")
