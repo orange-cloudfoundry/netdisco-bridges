@@ -53,6 +53,8 @@ entries:
 - `http://127.0.0.1:8080/api/v1/entries/{domain entry}/routes?format=default` - Gave http routes formatted for specified entry
 - `http://127.0.0.1:8080/api/v1/entries` - List all entries set
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/devices` - Gave all devices formatted for specified entry
+- `http://127.0.0.1:8080/api/v1/entries/{domain}/hosts` - Gave all devices as list of hostname as found in netdisco
+- `http://127.0.0.1:8080/api/v1/entries/{domain}/ips` - Gave all devices as list of ips as found in netdisco
 
 ### Prometheus metrics
 
@@ -198,7 +200,9 @@ Device information become accessible for each value, device has those informatio
 [ host: <string|template> | default = not set ]
 # metadata for let formatter do its magic
 # for now, only traefik use it
-# you can set `entryPoints` for traefik and `enableTls` to true to enable resolve on traefik on tls also.
+# you can set `entryPoints` for traefik
+# `enableTls` to true to enable resolve on traefik on tls also
+# 'middlewares' is a list of string setting middleare to use on traefik
 metadata:
   <string|template>: <map|template>
 ```

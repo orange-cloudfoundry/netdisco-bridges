@@ -24,6 +24,7 @@ type traefikRouter struct {
 	Service     string                  `json:"service,omitempty" toml:"service,omitempty" yaml:"service,omitempty" export:"true"`
 	Rule        string                  `json:"rule,omitempty" toml:"rule,omitempty" yaml:"rule,omitempty"`
 	TLS         *traefikRouterTLSConfig `json:"tls,omitempty" toml:"tls,omitempty" yaml:"tls,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
+	Middlewares []string                `json:"middlewares,omitempty" toml:"middlewares,omitempty" yaml:"middlewares,omitempty" export:"true"`
 }
 
 // traefikRouterTLSConfig holds the TLS configuration for a router.
@@ -80,7 +81,14 @@ func (t *Traefik) convertRoute(route models.Routing) (map[string]*traefikRouter,
 		port = fmt.Sprintf(":%d", route.Port)
 	}
 	url := fmt.Sprintf("%s://%s%s", route.Scheme, route.IP, port)
-
+	middlewares := make([]string, 0)
+	if middlewaresPts, ok := route.Metadata["middlewares"]; ok {
+		if mids, ok := middlewaresPts.([]interface{}); ok {
+			for _, m := range mids {
+				middlewares = append(middlewares, m.(string))
+			}
+		}
+	}
 	entrypoints := []string{"http"}
 	if intEntryPts, ok := route.Metadata["entryPoints"]; ok {
 		if newEntryPoints, ok := intEntryPts.([]interface{}); ok {
@@ -97,6 +105,7 @@ func (t *Traefik) convertRoute(route models.Routing) (map[string]*traefikRouter,
 		EntryPoints: entrypoints,
 		Service:     t.serviceName(route),
 		Rule:        fmt.Sprintf("Host(`%s`)", route.Host),
+		Middlewares: middlewares,
 	}
 	if _, ok := route.Metadata["enableTls"]; ok {
 		routers[serviceName+"-tls"] = &traefikRouter{
@@ -104,6 +113,7 @@ func (t *Traefik) convertRoute(route models.Routing) (map[string]*traefikRouter,
 			Service:     t.serviceName(route),
 			Rule:        fmt.Sprintf("Host(`%s`)", route.Host),
 			TLS:         &traefikRouterTLSConfig{},
+			Middlewares: middlewares,
 		}
 	}
 

@@ -58,6 +58,34 @@ func (s *HTTPServer) listDevices(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(s.resolver.ResolveDevices(domain)) //nolint
 }
 
+func (s *HTTPServer) listHosts(w http.ResponseWriter, req *http.Request) {
+	domain := mux.Vars(req)["domain"]
+	w.Header().Set("Content-Type", "application/json")
+	devices := s.resolver.ResolveDevices(domain)
+	hosts := make([]string, 0)
+	for _, d := range devices {
+		if d.DNS == "" {
+			continue
+		}
+		hosts = append(hosts, d.DNS)
+	}
+	json.NewEncoder(w).Encode(hosts) //nolint
+}
+
+func (s *HTTPServer) listIps(w http.ResponseWriter, req *http.Request) {
+	domain := mux.Vars(req)["domain"]
+	w.Header().Set("Content-Type", "application/json")
+	devices := s.resolver.ResolveDevices(domain)
+	ips := make([]string, 0)
+	for _, d := range devices {
+		if d.IP == "" {
+			continue
+		}
+		ips = append(ips, d.IP)
+	}
+	json.NewEncoder(w).Encode(ips) //nolint
+}
+
 func (s *HTTPServer) Run(ctx context.Context) {
 	s.mux.Path("/metrics").Handler(promhttp.Handler())
 	subRouter := s.mux.PathPrefix("/api/v1").Subrouter()
@@ -66,6 +94,8 @@ func (s *HTTPServer) Run(ctx context.Context) {
 	subRouter.HandleFunc("/entries/{domain}/routes", s.listRoutes)
 	subRouter.HandleFunc("/entries", s.listEntries)
 	subRouter.HandleFunc("/entries/{domain}/devices", s.listDevices)
+	subRouter.HandleFunc("/entries/{domain}/hosts", s.listHosts)
+	subRouter.HandleFunc("/entries/{domain}/ips", s.listIps)
 	listener, err := s.makeListener()
 	if err != nil {
 		log.Fatal(err.Error())
