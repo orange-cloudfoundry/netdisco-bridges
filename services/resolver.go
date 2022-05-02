@@ -231,3 +231,10 @@ func (r *Resolver) searchDevicesByEntry(entry *models.Entry) ([]netdisco.Device,
 	}
 	return devices, nil
 }
+
+func (r *Resolver) SearchDeviceByQ(anyData string) ([]netdisco.Device, error) {
+	return r.nClient.SearchDevice(&netdisco.SearchDeviceQuery{
+		Q:             anyData + "%",
+		SeeAllColumns: true,
+	})
+}

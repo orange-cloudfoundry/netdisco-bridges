@@ -55,6 +55,7 @@ entries:
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/devices` - Gave all devices formatted for specified entry
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/hosts` - Gave all devices as list of hostname as found in netdisco
 - `http://127.0.0.1:8080/api/v1/entries/{domain}/ips` - Gave all devices as list of ips as found in netdisco
+- `http://127.0.0.1:8080/api/v1/search/devices/{q}` - Gave all devices found with q value, return 404 if no device found
 
 ### Prometheus metrics
 

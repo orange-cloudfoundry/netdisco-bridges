@@ -86,9 +86,25 @@ func (s *HTTPServer) listIps(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(ips) //nolint
 }
 
+func (s *HTTPServer) searchDevices(w http.ResponseWriter, req *http.Request) {
+	q := mux.Vars(req)["q"]
+	w.Header().Set("Content-Type", "application/json")
+	devices, err := s.resolver.SearchDeviceByQ(q)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if len(devices) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	json.NewEncoder(w).Encode(devices) //nolint
+
+}
+
 func (s *HTTPServer) Run(ctx context.Context) {
 	s.mux.Path("/metrics").Handler(promhttp.Handler())
 	subRouter := s.mux.PathPrefix("/api/v1").Subrouter()
+	subRouter.HandleFunc("/search/devices/{q}", s.searchDevices)
 	subRouter.HandleFunc("/entries/*/routes", s.listRoutes)
 	subRouter.HandleFunc("/entries/*/routes/{format}", s.listRoutes)
 	subRouter.HandleFunc("/entries/{domain}/routes", s.listRoutes)
