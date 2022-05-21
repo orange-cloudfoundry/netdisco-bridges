@@ -106,7 +106,16 @@ func (s *HTTPServer) searchDevices(w http.ResponseWriter, req *http.Request) {
 	if len(devices) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	json.NewEncoder(w).Encode(devices) //nolint
+
+	if req.Header.Get("X-Grpc-Model") == "" {
+		json.NewEncoder(w).Encode(devices) //nolint
+		return
+	}
+	devicesGrpc := make([]models.DeviceGrpc, len(devices))
+	for i, device := range devices {
+		devicesGrpc[i] = models.DeviceGrpcFromNetdisco(device)
+	}
+	json.NewEncoder(w).Encode(devicesGrpc) //nolint
 }
 
 func (s *HTTPServer) Run(ctx context.Context) {
