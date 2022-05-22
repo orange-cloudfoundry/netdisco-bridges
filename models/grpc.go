@@ -22,10 +22,12 @@ type DeviceGrpc struct {
 	Location    string        `json:"location"`
 	Layers      int           `json:"layers"`
 }
+
 type DeviceGrpcMfg struct {
 	Name  string `json:"name"`
 	Model string `json:"model"`
 }
+
 type DeviceGrpcOs struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
@@ -48,7 +50,7 @@ func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
 		},
 		ChassisID:   device.ChassisID,
 		Serial:      device.Serial,
-		Uptime:      fmt.Sprintf("%ds", device.Uptime),
+		Uptime:      fmt.Sprintf("%ds", int64(device.Uptime/100)),
 		Description: device.Description,
 		Contact:     device.Contact,
 		Location:    device.Location,
