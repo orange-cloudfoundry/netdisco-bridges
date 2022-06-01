@@ -13,7 +13,7 @@ type DeviceGrpc struct {
 	MacAddress        string            `json:"macAddress"`
 	DNS               string            `json:"dns"`
 	Ports             Ports             `json:"ports"`
-	SupportedServices SupportedServices `json:"supported_services"`
+	SupportedServices SupportedServices `json:"supportedServices"`
 	Mfg               DeviceGrpcMfg     `json:"mfg"`
 	Os                DeviceGrpcOs      `json:"os"`
 	ChassisID         string            `json:"chassisId"`
