@@ -8,19 +8,21 @@ import (
 )
 
 type DeviceGrpc struct {
-	Name        string        `json:"name"`
-	IP          string        `json:"ip"`
-	MacAddress  string        `json:"macAddress"`
-	DNS         string        `json:"dns"`
-	Mfg         DeviceGrpcMfg `json:"mfg"`
-	Os          DeviceGrpcOs  `json:"os"`
-	ChassisID   string        `json:"chassisId"`
-	Serial      string        `json:"serial"`
-	Uptime      string        `json:"uptime"`
-	Description string        `json:"description"`
-	Contact     string        `json:"contact"`
-	Location    string        `json:"location"`
-	Layers      int           `json:"layers"`
+	Name              string            `json:"name"`
+	IP                string            `json:"ip"`
+	MacAddress        string            `json:"macAddress"`
+	DNS               string            `json:"dns"`
+	Ports             Ports             `json:"ports"`
+	SupportedServices SupportedServices `json:"supported_services"`
+	Mfg               DeviceGrpcMfg     `json:"mfg"`
+	Os                DeviceGrpcOs      `json:"os"`
+	ChassisID         string            `json:"chassisId"`
+	Serial            string            `json:"serial"`
+	Uptime            string            `json:"uptime"`
+	Description       string            `json:"description"`
+	Contact           string            `json:"contact"`
+	Location          string            `json:"location"`
+	Layers            int               `json:"layers"`
 }
 
 type DeviceGrpcMfg struct {
@@ -31,6 +33,18 @@ type DeviceGrpcMfg struct {
 type DeviceGrpcOs struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
+}
+
+type Ports struct {
+	Ssh   int32 `json:"ssh"`
+	Http  int32 `json:"http"`
+	Https int32 `json:"https"`
+}
+
+type SupportedServices struct {
+	Ssh   bool `json:"ssh"`
+	Http  bool `json:"http"`
+	Https bool `json:"https"`
 }
 
 func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
@@ -47,6 +61,16 @@ func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
 		Os: DeviceGrpcOs{
 			Name:    device.Os,
 			Version: device.OsVer,
+		},
+		Ports: Ports{
+			Ssh:   22,
+			Http:  80,
+			Https: 443,
+		},
+		SupportedServices: SupportedServices{
+			Ssh:   true,
+			Http:  false,
+			Https: false,
 		},
 		ChassisID:   device.ChassisID,
 		Serial:      device.Serial,
