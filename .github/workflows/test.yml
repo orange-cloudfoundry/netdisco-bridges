@@ -38,7 +38,8 @@ jobs:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: latest
 
-      - name: gitleaks
-        uses: zricethezav/gitleaks-action@master
-        with:
-          config-path: .gitleaks.toml
+# remove gitleaks has we need to pay now
+#      - name: gitleaks
+#        uses: zricethezav/gitleaks-action@master
+#        with:
+#          config-path: .gitleaks.toml
