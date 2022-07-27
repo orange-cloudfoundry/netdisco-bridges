@@ -74,7 +74,7 @@ func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
 		},
 		ChassisID:   device.ChassisID,
 		Serial:      device.Serial,
-		Uptime:      fmt.Sprintf("%ds", int64(device.Uptime/100)),
+		Uptime:      fmt.Sprintf("%ds", device.Uptime/100),
 		Description: device.Description,
 		Contact:     device.Contact,
 		Location:    device.Location,
