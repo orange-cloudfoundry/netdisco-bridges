@@ -8,21 +8,21 @@ import (
 )
 
 type DeviceGrpc struct {
-	Name              string            `json:"name"`
-	IP                string            `json:"ip"`
-	MacAddress        string            `json:"macAddress"`
-	DNS               string            `json:"dns"`
-	Ports             Ports             `json:"ports"`
-	SupportedServices SupportedServices `json:"supportedServices"`
-	Mfg               DeviceGrpcMfg     `json:"mfg"`
-	Os                DeviceGrpcOs      `json:"os"`
-	ChassisID         string            `json:"chassisId"`
-	Serial            string            `json:"serial"`
-	Uptime            string            `json:"uptime"`
-	Description       string            `json:"description"`
-	Contact           string            `json:"contact"`
-	Location          string            `json:"location"`
-	Layers            int               `json:"layers"`
+	Name              string           `json:"name"`
+	IP                string           `json:"ip"`
+	MacAddress        string           `json:"macAddress"`
+	DNS               string           `json:"dns"`
+	Ports             DeviceGrpcPorts  `json:"ports"`
+	SupportedServices DeviceGrpcSupSvc `json:"supportedServices"`
+	Mfg               DeviceGrpcMfg    `json:"mfg"`
+	Os                DeviceGrpcOs     `json:"os"`
+	ChassisID         string           `json:"chassisId"`
+	Serial            string           `json:"serial"`
+	Uptime            string           `json:"uptime"`
+	Description       string           `json:"description"`
+	Contact           string           `json:"contact"`
+	Location          string           `json:"location"`
+	Layers            int              `json:"layers"`
 }
 
 type DeviceGrpcMfg struct {
@@ -35,13 +35,13 @@ type DeviceGrpcOs struct {
 	Version string `json:"version"`
 }
 
-type Ports struct {
+type DeviceGrpcPorts struct {
 	Ssh   int32 `json:"ssh"`
 	Http  int32 `json:"http"`
 	Https int32 `json:"https"`
 }
 
-type SupportedServices struct {
+type DeviceGrpcSupSvc struct {
 	Ssh   bool `json:"ssh"`
 	Http  bool `json:"http"`
 	Https bool `json:"https"`
@@ -62,12 +62,12 @@ func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
 			Name:    device.Os,
 			Version: device.OsVer,
 		},
-		Ports: Ports{
+		Ports: DeviceGrpcPorts{
 			Ssh:   22,
 			Http:  80,
 			Https: 443,
 		},
-		SupportedServices: SupportedServices{
+		SupportedServices: DeviceGrpcSupSvc{
 			Ssh:   true,
 			Http:  false,
 			Https: false,

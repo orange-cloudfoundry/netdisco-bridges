@@ -229,7 +229,24 @@ func (r *Resolver) searchDevicesByEntry(entry *models.Entry) ([]netdisco.Device,
 		}
 		devices = append(devices, newDevices...)
 	}
-	return devices, nil
+	return r.filterDuplicateDevices(devices), nil
+}
+
+func (r *Resolver) filterDuplicateDevices(devices []netdisco.Device) []netdisco.Device {
+	finalDevices := make([]netdisco.Device, 0)
+	for _, device := range devices {
+		hasDevice := false
+		for _, finalDevice := range finalDevices {
+			if device.IP == finalDevice.IP {
+				hasDevice = true
+				break
+			}
+		}
+		if !hasDevice {
+			finalDevices = append(finalDevices, device)
+		}
+	}
+	return finalDevices
 }
 
 func (r *Resolver) SearchDeviceByQ(anyData string) ([]netdisco.Device, error) {
