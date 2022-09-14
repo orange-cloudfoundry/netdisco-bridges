@@ -55,7 +55,7 @@ func (c *DeviceCollectors) Describe(ch chan<- *prometheus.Desc) {
 	c.deviceInfo.Describe(ch)
 }
 
-//Collect implements required collect function for all promehteus collectors
+// Collect implements required collect function for all promehteus collectors
 func (c *DeviceCollectors) Collect(ch chan<- prometheus.Metric) {
 	c.deviceInfo.Reset()
 	for _, domain := range c.domains {

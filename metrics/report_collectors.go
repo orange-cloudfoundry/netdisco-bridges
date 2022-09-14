@@ -188,7 +188,7 @@ func (c *ReportsCollectors) Describe(ch chan<- *prometheus.Desc) {
 	c.vlanMismatch.Describe(ch)
 }
 
-//Collect implements required collect function for all promehteus collectors
+// Collect implements required collect function for all promehteus collectors
 func (c *ReportsCollectors) Collect(ch chan<- prometheus.Metric) {
 	c.noDns.Reset()
 	c.dnsMismatch.Reset()
