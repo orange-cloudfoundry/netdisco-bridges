@@ -92,13 +92,18 @@ func (s *HTTPServer) searchDevices(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	q := req.Form.Get("q")
-	if q == "" {
-		json.NewEncoder(w).Encode(make([]string, 0)) //nolint
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
-	devices, err := s.resolver.SearchDeviceByQ(q)
+	devices, err := s.resolver.SearchDeviceByRequest(&models.SearchRequest{
+		HostMatch:              req.Form.Get("q"),
+		ManufacturerNameMatch:  req.Form.Get("manufacturer_name"),
+		ManufacturerModelMatch: req.Form.Get("manufacturer_model"),
+		LocationMatch:          req.Form.Get("location"),
+		LayersMatch:            req.Form.Get("layers"),
+		SerialMatch:            req.Form.Get("serial"),
+		OsName:                 req.Form.Get("os_name"),
+		OsVersion:              req.Form.Get("os_version"),
+		MatchAll:               req.Form.Get("match_all") != "",
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -249,9 +249,36 @@ func (r *Resolver) filterDuplicateDevices(devices []netdisco.Device) []netdisco.
 	return finalDevices
 }
 
-func (r *Resolver) SearchDeviceByQ(anyData string) ([]netdisco.Device, error) {
-	return r.nClient.SearchDevice(&netdisco.SearchDeviceQuery{
-		Q:             anyData + "%",
+func (r *Resolver) SearchDeviceByRequest(req *models.SearchRequest) ([]netdisco.Device, error) {
+	query := &netdisco.SearchDeviceQuery{
 		SeeAllColumns: true,
-	})
+	}
+	if req.HostMatch != "" {
+		query.Q = req.HostMatch
+	}
+	if req.ManufacturerModelMatch != "" {
+		query.Model = req.ManufacturerModelMatch
+	}
+	if req.ManufacturerNameMatch != "" {
+		query.Vendor = req.ManufacturerNameMatch
+	}
+	if req.LocationMatch != "" {
+		query.Location = req.LocationMatch
+	}
+	if req.LayersMatch != "" {
+		query.Layers = req.LayersMatch
+	}
+	if req.SerialMatch != "" {
+		query.Q = req.SerialMatch
+	}
+	if req.OsName != "" {
+		query.OS = req.OsName
+	}
+	if req.OsVersion != "" {
+		query.OSVer = req.OsVersion
+	}
+	if req.MatchAll {
+		query.Matchall = true
+	}
+	return r.nClient.SearchDevice(query)
 }

@@ -171,3 +171,15 @@ func (q *SearchQuery) Id() uint64 {
 	q.queryId = xxh.Sum64()
 	return q.queryId
 }
+
+type SearchRequest struct {
+	HostMatch              string
+	ManufacturerNameMatch  string
+	ManufacturerModelMatch string
+	LocationMatch          string
+	LayersMatch            string
+	SerialMatch            string
+	OsName                 string
+	OsVersion              string
+	MatchAll               bool
+}
