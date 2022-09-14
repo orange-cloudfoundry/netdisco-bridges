@@ -183,3 +183,14 @@ type SearchRequest struct {
 	OsVersion              string
 	MatchAll               bool
 }
+
+func (r *SearchRequest) Empty() bool {
+	return r.HostMatch == "" &&
+		r.ManufacturerNameMatch == "" &&
+		r.ManufacturerModelMatch == "" &&
+		r.LocationMatch == "" &&
+		r.LayersMatch == "" &&
+		r.SerialMatch == "" &&
+		r.OsName == "" &&
+		r.OsVersion == ""
+}

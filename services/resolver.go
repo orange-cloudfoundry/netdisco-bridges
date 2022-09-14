@@ -253,32 +253,125 @@ func (r *Resolver) SearchDeviceByRequest(req *models.SearchRequest) ([]netdisco.
 	query := &netdisco.SearchDeviceQuery{
 		SeeAllColumns: true,
 	}
+	filterAfter := false
 	if req.HostMatch != "" {
-		query.Q = req.HostMatch
-	}
-	if req.ManufacturerModelMatch != "" {
-		query.Model = req.ManufacturerModelMatch
-	}
-	if req.ManufacturerNameMatch != "" {
-		query.Vendor = req.ManufacturerNameMatch
-	}
-	if req.LocationMatch != "" {
-		query.Location = req.LocationMatch
-	}
-	if req.LayersMatch != "" {
-		query.Layers = req.LayersMatch
+		query.Q = req.HostMatch + "%"
+		filterAfter = true
 	}
 	if req.SerialMatch != "" {
-		query.Q = req.SerialMatch
+		if req.HostMatch == "" {
+			query.Q = "%"
+		}
+		filterAfter = true
 	}
-	if req.OsName != "" {
+	// if q is not empty and you don't need to match all, we do not need to filter after
+	if !req.MatchAll && req.HostMatch != "" {
+		filterAfter = false
+	}
+	// if q is empty and you need to match all, we do not need to filter after
+	if req.Empty() {
+		query.Q = "%"
+		filterAfter = false
+	}
+
+	if !filterAfter && req.ManufacturerModelMatch != "" {
+		query.Model = req.ManufacturerModelMatch
+	}
+	if !filterAfter && req.ManufacturerNameMatch != "" {
+		query.Vendor = req.ManufacturerNameMatch
+	}
+	if !filterAfter && req.LocationMatch != "" {
+		query.Location = req.LocationMatch
+	}
+	if !filterAfter && req.LayersMatch != "" {
+		query.Layers = req.LayersMatch
+	}
+	if !filterAfter && req.OsName != "" {
 		query.OS = req.OsName
 	}
-	if req.OsVersion != "" {
+	if !filterAfter && req.OsVersion != "" {
 		query.OSVer = req.OsVersion
 	}
-	if req.MatchAll {
-		query.Matchall = true
+	devices, err := r.nClient.SearchDevice(query)
+	if err != nil {
+		return nil, err
 	}
-	return r.nClient.SearchDevice(query)
+	if !filterAfter {
+		return devices, nil
+	}
+	finalDevices := make([]netdisco.Device, 0)
+	for _, device := range devices {
+		if r.deviceMatchRequest(device, req) {
+			finalDevices = append(finalDevices, device)
+		}
+	}
+	return finalDevices, nil
+}
+
+func (r *Resolver) deviceMatchRequest(device netdisco.Device, req *models.SearchRequest) bool {
+	// not a big fan of what I've done here, refactor if you have time
+	if req.ManufacturerNameMatch != "" {
+		if strings.Contains(strings.ToLower(device.Vendor), strings.ToLower(req.ManufacturerNameMatch)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.ManufacturerModelMatch != "" {
+		if strings.Contains(strings.ToLower(device.Model), strings.ToLower(req.ManufacturerModelMatch)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.LocationMatch != "" {
+		if strings.Contains(strings.ToLower(device.Location), strings.ToLower(req.LocationMatch)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.LayersMatch != "" {
+		if strings.Contains(strings.ToLower(device.Layers), strings.ToLower(req.LayersMatch)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.SerialMatch != "" {
+		if strings.Contains(strings.ToLower(device.Serial), strings.ToLower(req.SerialMatch)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.OsName != "" {
+		if strings.Contains(strings.ToLower(device.Os), strings.ToLower(req.OsName)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	if req.OsVersion != "" {
+		if strings.Contains(strings.ToLower(device.OsVer), strings.ToLower(req.OsVersion)) {
+			if !req.MatchAll {
+				return true
+			}
+		} else {
+			return false
+		}
+	}
+	return true
 }

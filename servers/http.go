@@ -5,8 +5,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -92,17 +95,25 @@ func (s *HTTPServer) searchDevices(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	layers := req.Form.Get("layers")
+	if layers != "" {
+		layersUint, err := strconv.ParseUint(layers, 10, 64)
+		if err == nil {
+			layers = fmt.Sprintf("%08b", layersUint)
+		}
+	}
 	w.Header().Set("Content-Type", "application/json")
 	devices, err := s.resolver.SearchDeviceByRequest(&models.SearchRequest{
 		HostMatch:              req.Form.Get("q"),
 		ManufacturerNameMatch:  req.Form.Get("manufacturer_name"),
 		ManufacturerModelMatch: req.Form.Get("manufacturer_model"),
 		LocationMatch:          req.Form.Get("location"),
-		LayersMatch:            req.Form.Get("layers"),
+		LayersMatch:            layers,
 		SerialMatch:            req.Form.Get("serial"),
 		OsName:                 req.Form.Get("os_name"),
 		OsVersion:              req.Form.Get("os_version"),
-		MatchAll:               req.Form.Get("match_all") != "",
+		MatchAll:               strings.ToLower(req.Form.Get("match_all")) != "false",
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
