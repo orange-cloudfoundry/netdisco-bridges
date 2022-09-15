@@ -48,19 +48,43 @@ type DeviceGrpcSupSvc struct {
 }
 
 func DeviceGrpcFromNetdisco(device netdisco.Device) DeviceGrpc {
+	name := device.Name
+	if name == "" {
+		name = device.DNS
+	}
+	if name == "" {
+		name = device.IP
+	}
+	vendor := device.Vendor
+	if vendor == "" {
+		vendor = "Unknown"
+	}
+	model := device.Model
+	if model == "" {
+		model = "Unknown"
+	}
+
+	osName := device.Os
+	if osName == "" {
+		osName = "Unknown"
+	}
+	osVersion := device.OsVer
+	if osVersion == "" {
+		osVersion = "Unknown"
+	}
 	layerInt, _ := strconv.ParseInt(device.Layers, 2, 64)
 	return DeviceGrpc{
-		Name:       device.Name,
+		Name:       name,
 		IP:         device.IP,
 		MacAddress: device.Mac,
 		DNS:        device.DNS,
 		Mfg: DeviceGrpcMfg{
-			Name:  device.Vendor,
-			Model: device.Model,
+			Name:  vendor,
+			Model: model,
 		},
 		Os: DeviceGrpcOs{
-			Name:    device.Os,
-			Version: device.OsVer,
+			Name:    osName,
+			Version: osVersion,
 		},
 		Ports: DeviceGrpcPorts{
 			Ssh:   22,
