@@ -7,7 +7,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/miekg/dns v1.1.48
-	github.com/orange-cloudfoundry/go-netdisco v0.2.1
+	github.com/orange-cloudfoundry/go-netdisco v0.2.2
 	github.com/prometheus/client_golang v1.12.1
 	github.com/prometheus/common v0.34.0
 	github.com/sirupsen/logrus v1.8.1
